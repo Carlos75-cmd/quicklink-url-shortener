@@ -3,13 +3,13 @@ import { notFound } from 'next/navigation'
 import { urlDatabase } from '@/lib/database'
 
 interface PageProps {
-  params: {
+  params: Promise<{
     shortCode: string
-  }
+  }>
 }
 
 export default async function RedirectPage({ params }: PageProps) {
-  const { shortCode } = params
+  const { shortCode } = await params
 
   // Get URL from database
   const urlData = urlDatabase.get(shortCode)
@@ -28,7 +28,7 @@ export default async function RedirectPage({ params }: PageProps) {
 
 // Generate metadata for better SEO
 export async function generateMetadata({ params }: PageProps) {
-  const { shortCode } = params
+  const { shortCode } = await params
   const urlData = urlDatabase.get(shortCode)
 
   if (!urlData) {
