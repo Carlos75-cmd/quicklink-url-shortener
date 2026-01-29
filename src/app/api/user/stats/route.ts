@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { postgresAuthManager } from '@/lib/auth-postgres'
+import { persistentAuthManager } from '@/lib/persistent-auth'
 
 export async function GET(request: NextRequest) {
   try {
@@ -10,14 +11,31 @@ export async function GET(request: NextRequest) {
     }
 
     const sessionId = authHeader.substring(7)
-    const user = await postgresAuthManager.getUserBySession(sessionId)
+    let user = null
+    let userStats = null
+    
+    // Try PostgreSQL first, then fallback
+    try {
+      if (process.env.DATABASE_URL || process.env.POSTGRES_URL) {
+        user = await postgresAuthManager.getUserBySession(sessionId)
+        if (user) {
+          userStats = await postgresAuthManager.getUserStats(user.id)
+        }
+      } else {
+        throw new Error('No database URL, using fallback')
+      }
+    } catch (dbError) {
+      console.log('PostgreSQL not available for user stats, using fallback')
+      user = persistentAuthManager.getUserBySession(sessionId)
+      if (user) {
+        userStats = persistentAuthManager.getUserStats(user.id)
+      }
+    }
     
     if (!user) {
       return NextResponse.json({ error: 'Invalid session' }, { status: 401 })
     }
 
-    const userStats = await postgresAuthManager.getUserStats(user.id)
-    
     return NextResponse.json(userStats)
 
   } catch (error) {

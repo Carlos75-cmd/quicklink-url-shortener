@@ -12,5 +12,152 @@
     "clicks": 1,
     "createdAt": "2026-01-29T02:37:11.969Z",
     "userId": "user_ndiu0j"
+  },
+  {
+    "originalUrl": "https://example.com/test1",
+    "shortCode": "SpWeX2xH",
+    "clicks": 1,
+    "createdAt": "2026-01-29T03:27:32.370Z",
+    "userId": "user_tgdimq"
+  },
+  {
+    "originalUrl": "https://example.com/test2",
+    "shortCode": "i_b-nqR7",
+    "clicks": 0,
+    "createdAt": "2026-01-29T03:27:32.395Z",
+    "userId": "user_tgdimq"
+  },
+  {
+    "originalUrl": "https://example.com/test3",
+    "shortCode": "VU_yfOjN",
+    "clicks": 0,
+    "createdAt": "2026-01-29T03:27:32.415Z",
+    "userId": "user_tgdimq"
+  },
+  {
+    "originalUrl": "https://example.com/test4",
+    "shortCode": "9ZWVlm39",
+    "clicks": 0,
+    "createdAt": "2026-01-29T03:27:32.433Z",
+    "userId": "user_tgdimq"
+  },
+  {
+    "originalUrl": "https://example.com/test5",
+    "shortCode": "kErdBXYs",
+    "clicks": 0,
+    "createdAt": "2026-01-29T03:27:32.452Z",
+    "userId": "user_tgdimq"
+  },
+  {
+    "originalUrl": "https://enterprise-test.com",
+    "shortCode": "FyXUvY8g",
+    "clicks": 0,
+    "createdAt": "2026-01-29T03:27:32.654Z",
+    "userId": "user_1769654452166_c98c7011659a9508"
+  },
+  {
+    "originalUrl": "https://www.google.com",
+    "shortCode": "h8jSzzZ4",
+    "clicks": 1,
+    "createdAt": "2026-01-29T03:29:22.277Z",
+    "userId": "user_tgdimq"
+  },
+  {
+    "originalUrl": "https://test-limit.com/1",
+    "shortCode": "XyFuh06i",
+    "clicks": 1,
+    "createdAt": "2026-01-29T03:29:56.183Z",
+    "userId": "user_8glpk0"
+  },
+  {
+    "originalUrl": "https://test-limit.com/2",
+    "shortCode": "nYA9uGxO",
+    "clicks": 1,
+    "createdAt": "2026-01-29T03:29:56.296Z",
+    "userId": "user_8w1dln"
+  },
+  {
+    "originalUrl": "https://test-limit.com/3",
+    "shortCode": "om8xUFxA",
+    "clicks": 1,
+    "createdAt": "2026-01-29T03:29:56.415Z",
+    "userId": "user_8h49lc"
+  },
+  {
+    "originalUrl": "https://test-limit.com/4",
+    "shortCode": "MCgF8k45",
+    "clicks": 1,
+    "createdAt": "2026-01-29T03:29:56.503Z",
+    "userId": "user_8hk5e1"
+  },
+  {
+    "originalUrl": "https://test-limit.com/5",
+    "shortCode": "GPel5XQ3",
+    "clicks": 1,
+    "createdAt": "2026-01-29T03:29:56.575Z",
+    "userId": "user_8w4kl6"
+  },
+  {
+    "originalUrl": "https://test-limit.com/6",
+    "shortCode": "5doBhXlL",
+    "clicks": 1,
+    "createdAt": "2026-01-29T03:29:56.649Z",
+    "userId": "user_8w2j3q"
+  },
+  {
+    "originalUrl": "https://enterprise-test.com/1",
+    "shortCode": "xIKOzjRL",
+    "clicks": 0,
+    "createdAt": "2026-01-29T03:29:56.861Z",
+    "userId": "user_1769654452166_c98c7011659a9508"
+  },
+  {
+    "originalUrl": "https://enterprise-test.com/2",
+    "shortCode": "aOSQ0DVd",
+    "clicks": 0,
+    "createdAt": "2026-01-29T03:29:56.891Z",
+    "userId": "user_1769654452166_c98c7011659a9508"
+  },
+  {
+    "originalUrl": "https://enterprise-test.com/3",
+    "shortCode": "eC_Iol8y",
+    "clicks": 0,
+    "createdAt": "2026-01-29T03:29:56.922Z",
+    "userId": "user_1769654452166_c98c7011659a9508"
+  },
+  {
+    "originalUrl": "https://test1.com",
+    "shortCode": "kjjSznVN",
+    "clicks": 0,
+    "createdAt": "2026-01-29T03:30:16.691Z",
+    "userId": "user_tgdimq"
+  },
+  {
+    "originalUrl": "https://test2.com",
+    "shortCode": "jaVpE7gN",
+    "clicks": 0,
+    "createdAt": "2026-01-29T03:30:24.065Z",
+    "userId": "user_tgdimq"
+  },
+  {
+    "originalUrl": "https://test3.com",
+    "shortCode": "Zhg2uWdE",
+    "clicks": 0,
+    "createdAt": "2026-01-29T03:30:30.216Z",
+    "userId": "user_tgdimq"
+  },
+  {
+    "originalUrl": "https://test4.com",
+    "shortCode": "SLeapawa",
+    "clicks": 0,
+    "createdAt": "2026-01-29T03:30:35.982Z",
+    "userId": "user_tgdimq"
+  },
+  {
+    "originalUrl": "https://test5.com",
+    "shortCode": "FW8Fojq6",
+    "clicks": 0,
+    "createdAt": "2026-01-29T03:30:42.286Z",
+    "userId": "user_tgdimq"
   }
 ]

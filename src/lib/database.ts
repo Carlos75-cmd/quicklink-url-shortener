@@ -76,6 +76,15 @@ class UrlDatabase {
     return Array.from(this.urls.values()).reduce((sum, item) => sum + item.clicks, 0)
   }
 
+  incrementClicks(shortCode: string): void {
+    const urlData = this.urls.get(shortCode)
+    if (urlData) {
+      urlData.clicks++
+      this.saveToFile()
+      console.log(`Incremented clicks for ${shortCode}: ${urlData.clicks}`)
+    }
+  }
+
   // Debug method to list all URLs
   listAll() {
     console.log('All URLs in database:')
