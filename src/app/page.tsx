@@ -212,7 +212,7 @@ export default function Home() {
                 </ul>
                 <div className="w-full">
                   <PayPalButton 
-                    planId="P-6BY668786H2073917NF5LT5I"
+                    planId="P-3SH66323P5219774ENF5L3YY"
                     planName="Pro Plan"
                   />
                 </div>
@@ -257,7 +257,7 @@ export default function Home() {
                 </ul>
                 <div className="w-full">
                   <PayPalButton 
-                    planId="P-6XF07766D1679573BNF5LT5Q"
+                    planId="P-5HV56223BY4879009NF5L3ZA"
                     planName="Enterprise Plan"
                   />
                 </div>
