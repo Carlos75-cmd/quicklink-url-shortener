@@ -13,14 +13,28 @@ interface PayPalButtonProps {
 export default function PayPalButton({ planId, planName, onSuccess, onError }: PayPalButtonProps) {
   const [loading, setLoading] = useState(false)
 
+  // Fallback to hardcoded Client ID if env var fails
+  const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || 'Aev84IB12Q1N3-92HfV-IgV9bVrlhRw3Nfp0Vf-S7x97l3JoO5tViXMHQThSUQGYSx3xbiyIwQSBtg0d'
+
   const paypalOptions = {
-    clientId: 'Aev84IB12Q1N3-92HfV-IgV9bVrlhRw3Nfp0Vf-S7x97l3JoO5tViXMHQThSUQGYSx3xbiyIwQSBtg0d',
+    clientId: clientId,
     currency: 'USD',
     intent: 'subscription' as const,
     vault: true
   }
 
-  console.log('PayPal Button rendering with:', { planId, planName, paypalOptions })
+  console.log('PayPal Button rendering with:', { planId, planName, clientId: clientId.substring(0, 10) + '...' })
+
+  // Don't render if no client ID available
+  if (!clientId || clientId === 'test') {
+    return (
+      <div className="w-full">
+        <button className="w-full py-3 px-6 bg-gray-400 text-white rounded-lg cursor-not-allowed">
+          PayPal Configuration Required
+        </button>
+      </div>
+    )
+  }
 
   return (
     <div className="w-full">
