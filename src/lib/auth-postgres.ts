@@ -19,7 +19,11 @@ class PostgresAuthManager {
 
   async initialize() {
     if (!this.initialized) {
-      await initializeDatabase()
+      // Don't initialize database tables automatically in production
+      // Tables should be created manually using init-database.sql
+      if (process.env.NODE_ENV !== 'production') {
+        await initializeDatabase()
+      }
       await this.cleanExpiredSessions()
       await this.checkExpiredSubscriptions()
       await this.initializeTestUsers()
