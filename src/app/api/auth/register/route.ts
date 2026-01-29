@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
     }
 
     let result
-    let loginResult
+    let loginResult = null
     let userStats
 
     // Try PostgreSQL first, fallback to file system
@@ -36,13 +36,13 @@ export async function POST(request: NextRequest) {
         const ipAddress = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown'
         const userAgent = request.headers.get('user-agent') || 'unknown'
         loginResult = persistentAuthManager.login(email, password, ipAddress, userAgent)
-        if (loginResult.success) {
+        if (loginResult && loginResult.success) {
           userStats = persistentAuthManager.getUserStats(loginResult.user!.id)
         }
       }
     }
 
-    if (result.success && loginResult.success) {
+    if (result && result.success && loginResult && loginResult.success) {
       return NextResponse.json({
         success: true,
         user: loginResult.user,
@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    return NextResponse.json({ error: result.error }, { status: 400 })
+    return NextResponse.json({ error: result?.error || 'Registration failed' }, { status: 400 })
 
   } catch (error) {
     console.error('Registration error:', error)

@@ -14,8 +14,8 @@ export async function POST(request: NextRequest) {
     const ipAddress = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown'
     const userAgent = request.headers.get('user-agent') || 'unknown'
 
-    let result
-    let userStats
+    let result = null
+    let userStats = null
 
     // Try PostgreSQL first, fallback to file system
     try {
@@ -32,12 +32,12 @@ export async function POST(request: NextRequest) {
       // Initialize file system users if needed
       persistentAuthManager.initializeTestUsers()
       result = persistentAuthManager.login(email, password, ipAddress, userAgent)
-      if (result.success) {
+      if (result && result.success) {
         userStats = persistentAuthManager.getUserStats(result.user!.id)
       }
     }
 
-    if (result.success) {
+    if (result && result.success) {
       return NextResponse.json({
         success: true,
         user: result.user,
@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
         userStats
       })
     } else {
-      return NextResponse.json({ error: result.error }, { status: 401 })
+      return NextResponse.json({ error: result?.error || 'Login failed' }, { status: 401 })
     }
 
   } catch (error) {
