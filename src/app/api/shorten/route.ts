@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { nanoid } from 'nanoid'
 import { urlDatabase } from '@/lib/database'
+import { userManager } from '@/lib/user-management'
+import { persistentAuthManager } from '@/lib/persistent-auth'
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,6 +19,79 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid URL' }, { status: 400 })
     }
 
+    // Get user info from request
+    const ipAddress = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown'
+    const userAgent = request.headers.get('user-agent') || 'unknown'
+    const authHeader = request.headers.get('authorization')
+    
+    let userId: string
+    let userPlan: 'free' | 'pro' | 'enterprise' = 'free'
+    let isAuthenticated = false
+    let authenticatedUser = null
+
+    // Check if user is authenticated
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const sessionId = authHeader.substring(7)
+      authenticatedUser = persistentAuthManager.getUserBySession(sessionId)
+      
+      if (authenticatedUser) {
+        userId = authenticatedUser.id
+        userPlan = authenticatedUser.plan
+        isAuthenticated = true
+      } else {
+        userId = userManager.generateUserId(ipAddress, userAgent)
+      }
+    } else {
+      userId = userManager.generateUserId(ipAddress, userAgent)
+    }
+
+    // For authenticated users with paid plans, check subscription validity
+    if (isAuthenticated && (userPlan === 'pro' || userPlan === 'enterprise')) {
+      const userStats = persistentAuthManager.getUserStats(userId)
+      
+      // If subscription expired, they should be downgraded to free (handled in getUserBySession)
+      if (authenticatedUser!.plan === 'free') {
+        userPlan = 'free'
+        // Apply free user limits
+        const canCreate = userManager.canCreateUrl(userId, ipAddress, userAgent)
+        
+        if (!canCreate.canCreate) {
+          return NextResponse.json({ 
+            error: `Your subscription has expired. ${canCreate.reason === 'daily_limit_exceeded' ? 'Daily limit reached' : 'Monthly limit reached'}`,
+            upgradeMessage: 'Renew your subscription for unlimited URLs',
+            needsUpgrade: true,
+            subscriptionExpired: true
+          }, { status: 429 })
+        }
+      }
+      // Unlimited access for active paid users
+    } else {
+      // Check limits for free users (both authenticated and anonymous)
+      const canCreate = userManager.canCreateUrl(userId, ipAddress, userAgent)
+      
+      if (!canCreate.canCreate) {
+        let errorMessage = 'Usage limit exceeded'
+        let upgradeMessage = ''
+
+        if (canCreate.reason === 'daily_limit_exceeded') {
+          errorMessage = `Daily limit reached (${canCreate.used}/${canCreate.limit} URLs today)`
+          upgradeMessage = 'Upgrade to Pro for unlimited URLs'
+        } else if (canCreate.reason === 'monthly_limit_exceeded') {
+          errorMessage = `Monthly limit reached (${canCreate.used}/${canCreate.limit} URLs this month)`
+          upgradeMessage = 'Upgrade to Pro for unlimited URLs'
+        }
+
+        return NextResponse.json({ 
+          error: errorMessage,
+          upgradeMessage,
+          limit: canCreate.limit,
+          used: canCreate.used,
+          planType: canCreate.planType,
+          needsUpgrade: true
+        }, { status: 429 })
+      }
+    }
+
     // Generate short code
     const shortCode = nanoid(8)
     
@@ -25,15 +100,37 @@ export async function POST(request: NextRequest) {
       originalUrl: url,
       shortCode,
       clicks: 0,
-      createdAt: new Date()
+      createdAt: new Date(),
+      userId
     })
 
+    // Record URL creation
+    if (isAuthenticated) {
+      persistentAuthManager.incrementUrlCount(userId)
+    } else {
+      userManager.recordUrlCreation(userId, ipAddress, userAgent)
+    }
+
     const shortUrl = `${request.nextUrl.origin}/${shortCode}`
+
+    // Get updated user stats
+    let userStats
+    if (isAuthenticated) {
+      userStats = persistentAuthManager.getUserStats(userId)
+    } else {
+      const tempStats = userManager.getUserStats(userId)
+      userStats = {
+        plan: tempStats?.plan || 'free',
+        urlsCreated: tempStats?.urlsCreated || 0,
+        urlsCreatedToday: tempStats?.urlsCreatedToday || 0
+      }
+    }
 
     return NextResponse.json({ 
       shortUrl,
       shortCode,
-      originalUrl: url 
+      originalUrl: url,
+      userStats
     })
 
   } catch (error) {

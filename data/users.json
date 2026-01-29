@@ -1,0 +1,43 @@
+[
+  {
+    "id": "user_1769654452147_356ecf2d76af9d4f",
+    "email": "free@example.com",
+    "name": "Free User",
+    "passwordHash": "c72111b229a8a8a5b38a6242977ce933bc5d7f8c778f9ed7ec2f2ae261378596",
+    "salt": "6bd9643d4e253a6d9816adc6174db9fdac2d653abd27eab06765e04e250d0db8",
+    "plan": "free",
+    "urlsCreated": 0,
+    "createdAt": "2026-01-29T02:40:52.148Z",
+    "lastActivity": "2026-01-29T02:40:52.148Z"
+  },
+  {
+    "id": "user_1769654452150_11496622bd3b7e85",
+    "email": "pro@example.com",
+    "name": "Pro User",
+    "passwordHash": "c920e0359e43a95db18abea069902ad54e770c8d7d3583cba63b601769c18b33",
+    "salt": "f198ed234e9c26f04c553f81b69949bcbc8676c0f5f0f0daa575aded5a1bc47c",
+    "plan": "pro",
+    "urlsCreated": 0,
+    "createdAt": "2026-01-29T02:40:52.150Z",
+    "lastActivity": "2026-01-29T02:40:52.150Z",
+    "subscriptionId": "test_pro_subscription",
+    "subscriptionStatus": "active",
+    "subscriptionStart": "2026-01-29T02:40:52.164Z",
+    "subscriptionEnd": "2026-02-28T02:40:52.164Z"
+  },
+  {
+    "id": "user_1769654452166_c98c7011659a9508",
+    "email": "enterprise@example.com",
+    "name": "Enterprise User",
+    "passwordHash": "4e042545c610fe45379ec2f4ff9390af0c28faafdd5515fbafaf249f59cd334b",
+    "salt": "293331e3b06244b0ccb53fdd96dab6ce30cc08a0460f8f98a857b1747e02fcb1",
+    "plan": "enterprise",
+    "urlsCreated": 0,
+    "createdAt": "2026-01-29T02:40:52.166Z",
+    "lastActivity": "2026-01-29T02:40:52.166Z",
+    "subscriptionId": "test_enterprise_subscription",
+    "subscriptionStatus": "active",
+    "subscriptionStart": "2026-01-29T02:40:52.174Z",
+    "subscriptionEnd": "2026-02-28T02:40:52.174Z"
+  }
+]

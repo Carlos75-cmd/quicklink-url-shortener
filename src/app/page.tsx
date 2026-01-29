@@ -1,33 +1,86 @@
 'use client'
 
-import { useState } from 'react'
-import { Link, Copy, BarChart3, Shield, Zap } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Link, Copy, BarChart3, Shield, Zap, AlertCircle, User, LogOut } from 'lucide-react'
 import PayPalButton from '@/components/PayPalButton'
 import PayPalProvider from '@/components/PayPalProvider'
+
+interface AuthUser {
+  id: string
+  email: string
+  name: string
+  plan: 'free' | 'pro' | 'enterprise'
+}
 
 export default function Home() {
   const [url, setUrl] = useState('')
   const [shortUrl, setShortUrl] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [userStats, setUserStats] = useState<any>(null)
+  const [showUpgrade, setShowUpgrade] = useState(false)
+  const [currentUser, setCurrentUser] = useState<AuthUser | null>(null)
+
+  useEffect(() => {
+    // Verificar si hay usuario logueado
+    const sessionId = localStorage.getItem('sessionId')
+    const userData = localStorage.getItem('user')
+    
+    if (sessionId && userData) {
+      try {
+        setCurrentUser(JSON.parse(userData))
+      } catch (error) {
+        console.error('Error parsing user data:', error)
+        localStorage.removeItem('sessionId')
+        localStorage.removeItem('user')
+      }
+    }
+  }, [])
+
+  const handleLogout = () => {
+    localStorage.removeItem('sessionId')
+    localStorage.removeItem('user')
+    setCurrentUser(null)
+    window.location.reload()
+  }
 
   const handleShorten = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!url) return
 
     setIsLoading(true)
+    setError('')
+    setShowUpgrade(false)
+    
     try {
+      const headers: any = { 'Content-Type': 'application/json' }
+      
+      // Incluir sessionId si el usuario está logueado
+      const sessionId = localStorage.getItem('sessionId')
+      if (sessionId) {
+        headers['Authorization'] = `Bearer ${sessionId}`
+      }
+
       const response = await fetch('/api/shorten', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({ url })
       })
       
       const data = await response.json()
-      if (data.shortUrl) {
+      
+      if (response.ok) {
         setShortUrl(data.shortUrl)
+        setUserStats(data.userStats)
+      } else {
+        setError(data.error)
+        if (data.needsUpgrade) {
+          setShowUpgrade(true)
+        }
       }
     } catch (error) {
       console.error('Error shortening URL:', error)
+      setError('Something went wrong. Please try again.')
     } finally {
       setIsLoading(false)
     }
@@ -35,6 +88,14 @@ export default function Home() {
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(shortUrl)
+  }
+
+  const getPlanBadgeColor = (plan: string) => {
+    switch (plan) {
+      case 'pro': return 'bg-blue-100 text-blue-800'
+      case 'enterprise': return 'bg-purple-100 text-purple-800'
+      default: return 'bg-gray-100 text-gray-800'
+    }
   }
 
   return (
@@ -48,12 +109,39 @@ export default function Home() {
               <Link className="h-8 w-8 text-blue-600" />
               <span className="ml-2 text-2xl font-bold text-gray-900">QuickLink</span>
             </div>
-            <nav className="hidden md:flex space-x-8">
+            <nav className="hidden md:flex space-x-8 items-center">
               <a href="#features" className="text-gray-500 hover:text-gray-900">Features</a>
               <a href="#pricing" className="text-gray-500 hover:text-gray-900">Pricing</a>
-              <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
-                Sign Up
-              </button>
+              
+              {currentUser && (
+                <>
+                  <a href="/analytics" className="text-gray-500 hover:text-gray-900">Analytics</a>
+                  <a href="/admin" className="text-gray-500 hover:text-gray-900">My Links</a>
+                </>
+              )}
+              
+              {currentUser ? (
+                <div className="flex items-center space-x-4">
+                  <div className="flex items-center space-x-2">
+                    <User className="h-5 w-5 text-gray-500" />
+                    <span className="text-sm text-gray-700">{currentUser.name}</span>
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPlanBadgeColor(currentUser.plan)}`}>
+                      {currentUser.plan.toUpperCase()}
+                    </span>
+                  </div>
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center space-x-1 text-gray-500 hover:text-gray-700"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    <span className="text-sm">Logout</span>
+                  </button>
+                </div>
+              ) : (
+                <a href="/login" className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                  Sign In
+                </a>
+              )}
             </nav>
           </div>
         </div>
@@ -69,6 +157,72 @@ export default function Home() {
           <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
             Create short, branded links that drive engagement. Track clicks, analyze traffic, and optimize your marketing campaigns.
           </p>
+
+          {/* User Welcome */}
+          {currentUser && (
+            <div className="max-w-2xl mx-auto mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+              <div className="flex justify-center items-center space-x-4 text-sm">
+                <span className="text-green-700">
+                  Welcome back, <strong>{currentUser.name}</strong>!
+                </span>
+                <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPlanBadgeColor(currentUser.plan)}`}>
+                  {currentUser.plan.toUpperCase()} PLAN
+                </span>
+                {userStats && userStats.daysRemaining !== undefined && userStats.daysRemaining > 0 && (
+                  <span className="text-green-600 text-xs">
+                    {userStats.daysRemaining} days remaining
+                  </span>
+                )}
+                {userStats && userStats.daysRemaining === 0 && (
+                  <span className="text-red-600 text-xs font-medium">
+                    Subscription expired
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* User Stats */}
+          {userStats && (
+            <div className="max-w-2xl mx-auto mb-6 p-4 bg-blue-50 rounded-lg">
+              <div className="flex justify-center items-center space-x-6 text-sm">
+                <span className="text-blue-700">
+                  Plan: <strong className="capitalize">{userStats.plan}</strong>
+                </span>
+                <span className="text-blue-700">
+                  URLs Created: <strong>{userStats.urlsCreated}</strong>
+                </span>
+                <span className="text-blue-700">
+                  Today: <strong>{userStats.urlsCreatedToday}</strong>
+                </span>
+              </div>
+            </div>
+          )}
+
+          {/* Quick Access for Logged Users */}
+          {currentUser && (
+            <div className="max-w-2xl mx-auto mb-8">
+              <div className="bg-white rounded-lg shadow-lg p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Access</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <a
+                    href="/analytics"
+                    className="flex items-center justify-center px-4 py-3 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors"
+                  >
+                    <BarChart3 className="h-5 w-5 mr-2" />
+                    View Analytics
+                  </a>
+                  <a
+                    href="/admin"
+                    className="flex items-center justify-center px-4 py-3 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors"
+                  >
+                    <Link className="h-5 w-5 mr-2" />
+                    Manage Links
+                  </a>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* URL Shortener Form */}
           <div className="max-w-2xl mx-auto mb-12">
@@ -89,6 +243,38 @@ export default function Home() {
                 {isLoading ? 'Shortening...' : 'Shorten URL'}
               </button>
             </form>
+
+            {/* Login Prompt for Anonymous Users */}
+            {!currentUser && (
+              <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <p className="text-sm text-yellow-800">
+                  <strong>Anonymous users:</strong> Limited to 5 URLs per day. 
+                  <a href="/login" className="ml-1 text-yellow-900 underline hover:text-yellow-700">
+                    Sign in for more features!
+                  </a>
+                </p>
+              </div>
+            )}
+
+            {/* Error Message */}
+            {error && (
+              <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                <div className="flex items-center">
+                  <AlertCircle className="h-5 w-5 text-red-500 mr-2" />
+                  <p className="text-red-700">{error}</p>
+                </div>
+                {showUpgrade && (
+                  <div className="mt-3">
+                    <a 
+                      href="#pricing" 
+                      className="inline-flex items-center px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700"
+                    >
+                      Upgrade to Pro - Unlimited URLs
+                    </a>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Result */}
             {shortUrl && (
