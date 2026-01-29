@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import { Link, Copy, BarChart3, Shield, Zap } from 'lucide-react'
 import PayPalButton from '@/components/PayPalButton'
-import PayPalDebug from '@/components/PayPalDebug'
 
 export default function Home() {
   const [url, setUrl] = useState('')
@@ -214,6 +213,8 @@ export default function Home() {
                     planId="P-5ML4271244454362WXNWU5NQ"
                     planName="Pro Plan"
                   />
+                  {/* Debug: Verify Pro button is rendering */}
+                  <div className="text-xs text-gray-500 mt-1">Pro PayPal Button Should Be Above</div>
                 </div>
                 <p className="text-xs text-blue-600 mt-2 font-medium">💰 ROI: Typically pays for itself in saved time</p>
               </div>
@@ -259,6 +260,8 @@ export default function Home() {
                     planId="P-1GJ4568789604323WXNWU6NQ"
                     planName="Enterprise Plan"
                   />
+                  {/* Debug: Verify Enterprise button is rendering */}
+                  <div className="text-xs text-gray-500 mt-1">Enterprise PayPal Button Should Be Above</div>
                 </div>
                 <p className="text-xs text-purple-600 mt-2 font-medium">📞 Need more? Custom plans available</p>
               </div>
@@ -296,9 +299,6 @@ export default function Home() {
                 <span className="text-sm">💳 Cancel anytime</span>
                 <span className="text-sm">📊 30-day money back guarantee</span>
               </div>
-              
-              {/* Temporary Debug Info */}
-              <PayPalDebug />
             </div>
           </div>
         </div>
