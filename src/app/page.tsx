@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Link, Copy, BarChart3, Shield, Zap } from 'lucide-react'
 import PayPalButton from '@/components/PayPalButton'
+import PayPalProvider from '@/components/PayPalProvider'
 
 export default function Home() {
   const [url, setUrl] = useState('')
@@ -37,7 +38,8 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <PayPalProvider>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       {/* Header */}
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -210,11 +212,9 @@ export default function Home() {
                 </ul>
                 <div className="w-full">
                   <PayPalButton 
-                    planId="P-5ML4271244454362WXNWU5NQ"
+                    planId="P-6BY668786H2073917NF5LT5I"
                     planName="Pro Plan"
                   />
-                  {/* Debug: Verify Pro button is rendering */}
-                  <div className="text-xs text-gray-500 mt-1">Pro PayPal Button Should Be Above</div>
                 </div>
                 <p className="text-xs text-blue-600 mt-2 font-medium">💰 ROI: Typically pays for itself in saved time</p>
               </div>
@@ -257,11 +257,9 @@ export default function Home() {
                 </ul>
                 <div className="w-full">
                   <PayPalButton 
-                    planId="P-1GJ4568789604323WXNWU6NQ"
+                    planId="P-6XF07766D1679573BNF5LT5Q"
                     planName="Enterprise Plan"
                   />
-                  {/* Debug: Verify Enterprise button is rendering */}
-                  <div className="text-xs text-gray-500 mt-1">Enterprise PayPal Button Should Be Above</div>
                 </div>
                 <p className="text-xs text-purple-600 mt-2 font-medium">📞 Need more? Custom plans available</p>
               </div>
@@ -310,6 +308,7 @@ export default function Home() {
           <p>&copy; 2025 QuickLink. All rights reserved.</p>
         </div>
       </footer>
-    </div>
+      </div>
+    </PayPalProvider>
   )
 }

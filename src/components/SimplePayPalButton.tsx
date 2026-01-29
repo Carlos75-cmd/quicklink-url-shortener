@@ -3,17 +3,15 @@
 import { PayPalButtons } from '@paypal/react-paypal-js'
 import { useState } from 'react'
 
-interface PayPalButtonProps {
-  planId: string
+interface SimplePayPalButtonProps {
+  amount: string
   planName: string
-  onSuccess?: (subscriptionId: string) => void
+  onSuccess?: (orderId: string) => void
   onError?: (error: any) => void
 }
 
-export default function PayPalButton({ planId, planName, onSuccess, onError }: PayPalButtonProps) {
+export default function SimplePayPalButton({ amount, planName, onSuccess, onError }: SimplePayPalButtonProps) {
   const [loading, setLoading] = useState(false)
-
-  console.log('PayPal Button rendering with:', { planId, planName })
 
   return (
     <div className="w-full">
@@ -30,45 +28,45 @@ export default function PayPalButton({ planId, planName, onSuccess, onError }: P
             layout: 'vertical',
             color: 'blue',
             shape: 'rect',
-            label: 'subscribe'
+            label: 'pay'
           }}
-          createSubscription={(data, actions) => {
-            console.log('Creating subscription for plan:', planId)
+          createOrder={(data, actions) => {
             setLoading(true)
-            return actions.subscription.create({
-              plan_id: planId,
-              application_context: {
-                brand_name: 'QuickLink',
-                user_action: 'SUBSCRIBE_NOW',
-                return_url: `${window.location.origin}/success`,
-                cancel_url: `${window.location.origin}/cancel`
-              }
+            return actions.order.create({
+              purchase_units: [{
+                amount: {
+                  value: amount,
+                  currency_code: 'USD'
+                },
+                description: `${planName} - Monthly Subscription`
+              }]
             })
           }}
           onApprove={async (data, actions) => {
             try {
-              console.log('Subscription approved:', data.subscriptionID)
+              const order = await actions.order?.capture()
+              console.log('Payment successful:', order)
               
-              // Call your backend to save the subscription
-              const response = await fetch('/api/subscriptions', {
+              // Call your backend to save the payment
+              const response = await fetch('/api/payments', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                  subscriptionId: data.subscriptionID || '',
-                  planName: planName
+                  orderId: data.orderID,
+                  planName: planName,
+                  amount: amount
                 })
               })
 
               if (response.ok) {
-                const subscriptionId = data.subscriptionID || ''
-                onSuccess?.(subscriptionId)
+                onSuccess?.(data.orderID)
                 // Redirect to success page
-                window.location.href = '/success?subscription=' + subscriptionId
+                window.location.href = '/success?order=' + data.orderID
               } else {
-                throw new Error('Failed to save subscription')
+                throw new Error('Failed to save payment')
               }
             } catch (error) {
-              console.error('Subscription error:', error)
+              console.error('Payment error:', error)
               onError?.(error)
             } finally {
               setLoading(false)
