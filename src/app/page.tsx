@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Link, Copy, BarChart3, Shield, Zap } from 'lucide-react'
 import PayPalButton from '@/components/PayPalButton'
+import PayPalDebug from '@/components/PayPalDebug'
 
 export default function Home() {
   const [url, setUrl] = useState('')
@@ -295,6 +296,9 @@ export default function Home() {
                 <span className="text-sm">💳 Cancel anytime</span>
                 <span className="text-sm">📊 30-day money back guarantee</span>
               </div>
+              
+              {/* Temporary Debug Info */}
+              <PayPalDebug />
             </div>
           </div>
         </div>
