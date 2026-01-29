@@ -33,6 +33,7 @@ export default function SimplePayPalButton({ amount, planName, onSuccess, onErro
           createOrder={(data, actions) => {
             setLoading(true)
             return actions.order.create({
+              intent: 'CAPTURE',
               purchase_units: [{
                 amount: {
                   value: amount,
