@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { nanoid } from 'nanoid'
-import { urlDatabase } from '@/lib/database'
+import { postgresUrlDatabase } from '@/lib/database-postgres'
 import { userManager } from '@/lib/user-management'
-import { persistentAuthManager } from '@/lib/persistent-auth'
+import { postgresAuthManager } from '@/lib/auth-postgres'
 
 export async function POST(request: NextRequest) {
   try {
@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
     // Check if user is authenticated
     if (authHeader && authHeader.startsWith('Bearer ')) {
       const sessionId = authHeader.substring(7)
-      authenticatedUser = persistentAuthManager.getUserBySession(sessionId)
+      authenticatedUser = await postgresAuthManager.getUserBySession(sessionId)
       
       if (authenticatedUser) {
         userId = authenticatedUser.id
@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
 
     // For authenticated users with paid plans, check subscription validity
     if (isAuthenticated && (userPlan === 'pro' || userPlan === 'enterprise')) {
-      const userStats = persistentAuthManager.getUserStats(userId)
+      const userStats = await postgresAuthManager.getUserStats(userId)
       
       // If subscription expired, they should be downgraded to free (handled in getUserBySession)
       if (authenticatedUser!.plan === 'free') {
@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
     const shortCode = nanoid(8)
     
     // Store in database
-    urlDatabase.set(shortCode, {
+    await postgresUrlDatabase.set(shortCode, {
       originalUrl: url,
       shortCode,
       clicks: 0,
@@ -106,7 +106,7 @@ export async function POST(request: NextRequest) {
 
     // Record URL creation
     if (isAuthenticated) {
-      persistentAuthManager.incrementUrlCount(userId)
+      await postgresAuthManager.incrementUrlCount(userId)
     } else {
       userManager.recordUrlCreation(userId, ipAddress, userAgent)
     }
@@ -116,7 +116,7 @@ export async function POST(request: NextRequest) {
     // Get updated user stats
     let userStats
     if (isAuthenticated) {
-      userStats = persistentAuthManager.getUserStats(userId)
+      userStats = await postgresAuthManager.getUserStats(userId)
     } else {
       const tempStats = userManager.getUserStats(userId)
       userStats = {
@@ -142,8 +142,8 @@ export async function POST(request: NextRequest) {
 export async function GET() {
   // Return stats for admin/analytics
   const stats = {
-    totalUrls: urlDatabase.size(),
-    totalClicks: urlDatabase.getTotalClicks()
+    totalUrls: await postgresUrlDatabase.size(),
+    totalClicks: await postgresUrlDatabase.getTotalClicks()
   }
   
   return NextResponse.json(stats)

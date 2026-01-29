@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { persistentAuthManager } from '@/lib/persistent-auth'
+import { postgresAuthManager } from '@/lib/auth-postgres'
 
 // Simple in-memory storage for subscriptions (replace with database in production)
 const subscriptions = new Map<string, {
@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
 
     if (authHeader && authHeader.startsWith('Bearer ')) {
       const sessionId = authHeader.substring(7)
-      const user = persistentAuthManager.getUserBySession(sessionId)
+      const user = await postgresAuthManager.getUserBySession(sessionId)
       if (user) {
         userId = user.id
       }
@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
 
     // Update user subscription if user is authenticated
     if (userId) {
-      persistentAuthManager.updateUserSubscription(userId, {
+      await postgresAuthManager.updateUserSubscription(userId, {
         subscriptionId,
         plan: planType,
         status: 'active',

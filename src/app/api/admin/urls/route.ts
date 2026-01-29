@@ -1,13 +1,15 @@
 import { NextResponse } from 'next/server'
-import { urlDatabase } from '@/lib/database'
+import { postgresUrlDatabase } from '@/lib/database-postgres'
 
 export async function GET() {
   try {
-    const urls = urlDatabase.getAll()
+    const urls = await postgresUrlDatabase.getAll()
     
     return NextResponse.json({ 
       urls: urls.map(url => ({
-        ...url,
+        originalUrl: url.originalUrl,
+        shortCode: url.shortCode,
+        clicks: url.clicks,
         createdAt: url.createdAt.toISOString()
       }))
     })
