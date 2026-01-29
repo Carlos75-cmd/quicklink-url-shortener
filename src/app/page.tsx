@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Link, Copy, BarChart3, Shield, Zap } from 'lucide-react'
+import PayPalButton from '@/components/PayPalButton'
 
 export default function Home() {
   const [url, setUrl] = useState('')
@@ -153,9 +154,12 @@ export default function Home() {
                   <li>✓ Custom domains</li>
                   <li>✓ Priority support</li>
                 </ul>
-                <button className="w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                  Start Free Trial
-                </button>
+                <div className="w-full">
+                  <PayPalButton 
+                    planId="P-5ML4271244454362WXNWU5NQ"
+                    planName="Pro Plan"
+                  />
+                </div>
               </div>
               <div className="text-center p-6 border rounded-lg">
                 <h3 className="text-xl font-semibold mb-2">Enterprise</h3>
@@ -166,9 +170,12 @@ export default function Home() {
                   <li>✓ API access</li>
                   <li>✓ White-label solution</li>
                 </ul>
-                <button className="w-full py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-                  Contact Sales
-                </button>
+                <div className="w-full">
+                  <PayPalButton 
+                    planId="P-1GJ4568789604323WXNWU6NQ"
+                    planName="Enterprise Plan"
+                  />
+                </div>
               </div>
             </div>
           </div>

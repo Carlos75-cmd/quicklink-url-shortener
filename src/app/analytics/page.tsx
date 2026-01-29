@@ -10,10 +10,12 @@ interface Stats {
 
 export default function Analytics() {
   const [stats, setStats] = useState<Stats>({ totalUrls: 0, totalClicks: 0 })
+  const [revenue, setRevenue] = useState({ totalRevenue: 0, totalSubscriptions: 0 })
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     fetchStats()
+    fetchRevenue()
   }, [])
 
   const fetchStats = async () => {
@@ -23,6 +25,16 @@ export default function Analytics() {
       setStats(data)
     } catch (error) {
       console.error('Error fetching stats:', error)
+    }
+  }
+
+  const fetchRevenue = async () => {
+    try {
+      const response = await fetch('/api/subscriptions')
+      const data = await response.json()
+      setRevenue(data)
+    } catch (error) {
+      console.error('Error fetching revenue:', error)
     } finally {
       setLoading(false)
     }
@@ -65,7 +77,7 @@ export default function Analytics() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow-lg p-6">
             <div className="flex items-center">
               <Link className="h-8 w-8 text-blue-600" />
@@ -102,8 +114,20 @@ export default function Analytics() {
             <div className="flex items-center">
               <Calendar className="h-8 w-8 text-orange-600" />
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-500">This Month</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.totalUrls}</p>
+                <p className="text-sm font-medium text-gray-500">Subscribers</p>
+                <p className="text-2xl font-bold text-gray-900">{revenue.totalSubscriptions}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow-lg p-6">
+            <div className="flex items-center">
+              <div className="h-8 w-8 bg-green-600 rounded-full flex items-center justify-center">
+                <span className="text-white font-bold text-sm">$</span>
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-500">Monthly Revenue</p>
+                <p className="text-2xl font-bold text-green-600">${revenue.totalRevenue}</p>
               </div>
             </div>
           </div>
