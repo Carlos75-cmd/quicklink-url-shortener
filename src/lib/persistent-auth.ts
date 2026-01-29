@@ -374,6 +374,60 @@ class PersistentAuthManager {
       console.log('Test users initialized with persistent storage')
     }
   }
+
+  // Generate API key for Enterprise users
+  generateApiKey(userId: string): string {
+    const user = this.users.get(userId)
+    
+    if (!user || user.plan !== 'enterprise') {
+      throw new Error('API keys are only available for Enterprise users')
+    }
+
+    const apiKey = 'qk_' + randomBytes(32).toString('hex');
+    // Store API key in user object (extend interface if needed)
+    (user as any).apiKey = apiKey;
+    this.saveUsers()
+    
+    return apiKey
+  }
+
+  // Get user by API key
+  getUserByApiKey(apiKey: string): PersistentUser | null {
+    const users = Array.from(this.users.values());
+    for (const user of users) {
+      if ((user as any).apiKey === apiKey) {
+        // Check if subscription is expired
+        if (user.plan !== 'free' && this.isSubscriptionExpired(user)) {
+          user.plan = 'free';
+          user.subscriptionStatus = 'expired';
+          this.saveUsers();
+        }
+        return user;
+      }
+    }
+    return null;
+  }
+
+  // API usage tracking (simple in-memory for fallback)
+  private apiUsage = new Map<string, { requests: number, month: string }>()
+
+  getApiUsage(userId: string, month: string): { requests: number, limit: number } {
+    const key = `${userId}_${month}`
+    const usage = this.apiUsage.get(key)
+    return {
+      requests: usage?.requests || 0,
+      limit: 1000000 // 1M requests per month for Enterprise
+    }
+  }
+
+  incrementApiUsage(userId: string, month: string): void {
+    const key = `${userId}_${month}`
+    const current = this.apiUsage.get(key)
+    this.apiUsage.set(key, {
+      requests: (current?.requests || 0) + 1,
+      month
+    })
+  }
 }
 
 export const persistentAuthManager = new PersistentAuthManager()

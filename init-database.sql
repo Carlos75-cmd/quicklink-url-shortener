@@ -1,77 +1,76 @@
--- QuickLink Database Schema
+-- QuickLink Database Schema - Updated with Enterprise Features
 -- Execute this SQL in your Neon dashboard SQL Editor
 
--- Create users table
-CREATE TABLE IF NOT EXISTS users (
-  id SERIAL PRIMARY KEY,
-  user_id VARCHAR(255) UNIQUE NOT NULL,
-  email VARCHAR(255) UNIQUE NOT NULL,
-  name VARCHAR(255) NOT NULL,
-  password_hash VARCHAR(255) NOT NULL,
-  salt VARCHAR(255) NOT NULL,
-  plan VARCHAR(20) DEFAULT 'free',
-  subscription_id VARCHAR(255),
-  subscription_status VARCHAR(20),
-  subscription_start TIMESTAMP,
-  subscription_end TIMESTAMP,
-  urls_created INTEGER DEFAULT 0,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  last_activity TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+-- Add new columns to existing users table
+ALTER TABLE users 
+ADD COLUMN IF NOT EXISTS api_key VARCHAR(255) UNIQUE,
+ADD COLUMN IF NOT EXISTS team_id VARCHAR(255),
+ADD COLUMN IF NOT EXISTS is_team_owner BOOLEAN DEFAULT FALSE;
+
+-- Add new column to urls table
+ALTER TABLE urls 
+ADD COLUMN IF NOT EXISTS created_via_api BOOLEAN DEFAULT FALSE;
+
+-- Create API usage tracking table
+CREATE TABLE IF NOT EXISTS api_usage (
+    id SERIAL PRIMARY KEY,
+    user_id VARCHAR(255) NOT NULL,
+    month VARCHAR(7) NOT NULL, -- Format: YYYY-MM
+    requests INTEGER DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_id, month),
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
--- Create urls table
-CREATE TABLE IF NOT EXISTS urls (
-  id SERIAL PRIMARY KEY,
-  original_url TEXT NOT NULL,
-  short_code VARCHAR(20) UNIQUE NOT NULL,
-  clicks INTEGER DEFAULT 0,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  user_id VARCHAR(255)
+-- Create teams table for team management
+CREATE TABLE IF NOT EXISTS teams (
+    id SERIAL PRIMARY KEY,
+    team_id VARCHAR(255) UNIQUE NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    owner_id VARCHAR(255) NOT NULL,
+    plan VARCHAR(50) DEFAULT 'enterprise',
+    max_members INTEGER DEFAULT 10,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (owner_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
--- Create sessions table
-CREATE TABLE IF NOT EXISTS sessions (
-  id SERIAL PRIMARY KEY,
-  session_id VARCHAR(255) UNIQUE NOT NULL,
-  user_id VARCHAR(255) NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  expires_at TIMESTAMP NOT NULL,
-  ip_address VARCHAR(45),
-  user_agent TEXT
+-- Create team members table
+CREATE TABLE IF NOT EXISTS team_members (
+    id SERIAL PRIMARY KEY,
+    team_id VARCHAR(255) NOT NULL,
+    user_id VARCHAR(255) NOT NULL,
+    role VARCHAR(50) DEFAULT 'member', -- owner, admin, member
+    joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(team_id, user_id),
+    FOREIGN KEY (team_id) REFERENCES teams(team_id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
--- Create indexes for better performance
-CREATE INDEX IF NOT EXISTS idx_urls_short_code ON urls(short_code);
-CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
-CREATE INDEX IF NOT EXISTS idx_users_user_id ON users(user_id);
-CREATE INDEX IF NOT EXISTS idx_sessions_session_id ON sessions(session_id);
-CREATE INDEX IF NOT EXISTS idx_sessions_expires_at ON sessions(expires_at);
+-- Create additional indexes for new features
+CREATE INDEX IF NOT EXISTS idx_users_api_key ON users(api_key);
+CREATE INDEX IF NOT EXISTS idx_api_usage_user_month ON api_usage(user_id, month);
+CREATE INDEX IF NOT EXISTS idx_teams_owner ON teams(owner_id);
+CREATE INDEX IF NOT EXISTS idx_team_members_team ON team_members(team_id);
+CREATE INDEX IF NOT EXISTS idx_team_members_user ON team_members(user_id);
 
--- Insert test users (with hashed passwords for 'password123')
--- Note: These are example hashes, the actual app will create proper hashes
-INSERT INTO users (user_id, email, name, password_hash, salt, plan, urls_created, created_at, last_activity) 
-VALUES 
-  ('user_test_free', 'free@example.com', 'Free User', 'dummy_hash_1', 'dummy_salt_1', 'free', 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-  ('user_test_pro', 'pro@example.com', 'Pro User', 'dummy_hash_2', 'dummy_salt_2', 'pro', 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-  ('user_test_enterprise', 'enterprise@example.com', 'Enterprise User', 'dummy_hash_3', 'dummy_salt_3', 'enterprise', 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-ON CONFLICT (email) DO NOTHING;
-
--- Update pro user with subscription
+-- Generate API key for existing enterprise user
 UPDATE users SET 
-  subscription_id = 'test_pro_subscription',
-  subscription_status = 'active',
-  subscription_start = CURRENT_TIMESTAMP,
-  subscription_end = CURRENT_TIMESTAMP + INTERVAL '30 days'
-WHERE email = 'pro@example.com';
+  api_key = 'qk_demo_' || substr(md5(random()::text), 1, 32)
+WHERE email = 'enterprise@example.com' AND api_key IS NULL;
 
--- Update enterprise user with subscription  
-UPDATE users SET 
-  subscription_id = 'test_enterprise_subscription',
-  subscription_status = 'active',
-  subscription_start = CURRENT_TIMESTAMP,
-  subscription_end = CURRENT_TIMESTAMP + INTERVAL '30 days'
-WHERE email = 'enterprise@example.com';
+-- Verify new features
+SELECT 'Enterprise features added successfully!' as status;
+SELECT 
+  email, 
+  plan, 
+  api_key IS NOT NULL as has_api_key,
+  subscription_status
+FROM users 
+WHERE plan IN ('pro', 'enterprise');
 
--- Verify tables were created
-SELECT 'Tables created successfully!' as status;
-SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';
+-- Show table structure
+SELECT table_name, column_name, data_type 
+FROM information_schema.columns 
+WHERE table_schema = 'public' 
+ORDER BY table_name, ordinal_position;

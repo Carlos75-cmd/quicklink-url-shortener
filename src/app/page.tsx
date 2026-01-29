@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { Link, Copy, BarChart3, Shield, Zap, AlertCircle, User, LogOut } from 'lucide-react'
 import PayPalButton from '@/components/PayPalButton'
 import PayPalProvider from '@/components/PayPalProvider'
+import { useWhiteLabel } from '@/components/BrandingWrapper'
 
 interface AuthUser {
   id: string
@@ -20,6 +21,7 @@ export default function Home() {
   const [userStats, setUserStats] = useState<any>(null)
   const [showUpgrade, setShowUpgrade] = useState(false)
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(null)
+  const isWhiteLabel = useWhiteLabel()
 
   useEffect(() => {
     // Verificar si hay usuario logueado
@@ -107,7 +109,9 @@ export default function Home() {
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center">
               <Link className="h-8 w-8 text-blue-600" />
-              <span className="ml-2 text-2xl font-bold text-gray-900">QuickLink</span>
+              <span className="ml-2 text-2xl font-bold text-gray-900">
+                {isWhiteLabel ? 'URL Shortener' : 'QuickLink'}
+              </span>
             </div>
             <nav className="hidden md:flex space-x-8 items-center">
               <a href="#features" className="text-gray-500 hover:text-gray-900">Features</a>
@@ -117,6 +121,9 @@ export default function Home() {
                 <>
                   <a href="/analytics" className="text-gray-500 hover:text-gray-900">Analytics</a>
                   <a href="/admin" className="text-gray-500 hover:text-gray-900">My Links</a>
+                  {currentUser.plan === 'enterprise' && (
+                    <a href="/api-keys" className="text-gray-500 hover:text-gray-900">API Keys</a>
+                  )}
                 </>
               )}
               
@@ -422,10 +429,6 @@ export default function Home() {
                   </li>
                   <li className="flex items-center">
                     <span className="text-green-500 mr-2">✓</span>
-                    <span className="text-sm text-gray-800"><strong>Team management</strong> (up to 10 users)</span>
-                  </li>
-                  <li className="flex items-center">
-                    <span className="text-green-500 mr-2">✓</span>
                     <span className="text-sm text-gray-800"><strong>Full API access</strong> (1M requests/month)</span>
                   </li>
                   <li className="flex items-center">
@@ -434,11 +437,15 @@ export default function Home() {
                   </li>
                   <li className="flex items-center">
                     <span className="text-green-500 mr-2">✓</span>
-                    <span className="text-sm text-gray-800"><strong>24/7 phone support</strong> + dedicated manager</span>
+                    <span className="text-sm text-gray-800"><strong>Custom short codes</strong> via API</span>
                   </li>
                   <li className="flex items-center">
                     <span className="text-green-500 mr-2">✓</span>
-                    <span className="text-sm text-gray-800"><strong>Advanced integrations</strong> (Zapier, Slack)</span>
+                    <span className="text-sm text-gray-800"><strong>Priority support</strong> (email)</span>
+                  </li>
+                  <li className="flex items-center">
+                    <span className="text-blue-500 mr-2">🚧</span>
+                    <span className="text-sm text-gray-600"><strong>Team management</strong> (coming soon)</span>
                   </li>
                 </ul>
                 <div className="w-full">
@@ -447,7 +454,7 @@ export default function Home() {
                     planName="Enterprise Plan"
                   />
                 </div>
-                <p className="text-xs text-purple-600 mt-2 font-medium">📞 Need more? Custom plans available</p>
+                <p className="text-xs text-purple-600 mt-2 font-medium">📞 Need custom features? Contact us</p>
               </div>
             </div>
 
@@ -491,7 +498,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-12 mt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <p>&copy; 2025 QuickLink. All rights reserved.</p>
+          <p>&copy; 2025 {isWhiteLabel ? 'URL Shortener' : 'QuickLink'}. All rights reserved.</p>
         </div>
       </footer>
       </div>

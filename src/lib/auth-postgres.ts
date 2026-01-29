@@ -7,6 +7,21 @@ import {
   initializeDatabase 
 } from './database-postgres'
 
+// Import getPool function
+async function getPool() {
+  const { Pool } = await import('pg')
+  const connectionString = process.env.DATABASE_URL || process.env.POSTGRES_URL
+  
+  if (!connectionString) {
+    throw new Error('No database connection string found. Please set DATABASE_URL or POSTGRES_URL environment variable.')
+  }
+  
+  return new Pool({
+    connectionString,
+    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+  })
+}
+
 export interface AuthUser {
   id: string
   email: string
@@ -355,6 +370,93 @@ class PostgresAuthManager {
       }
     } catch (error) {
       console.error('Error initializing test users:', error)
+    }
+  }
+
+  // Generate API key for Enterprise users
+  async generateApiKey(userId: string): Promise<string> {
+    try {
+      await this.initialize()
+      const user = await postgresUserDatabase.getUserById(userId)
+      
+      if (!user || user.plan !== 'enterprise') {
+        throw new Error('API keys are only available for Enterprise users')
+      }
+
+      const apiKey = 'qk_' + randomBytes(32).toString('hex')
+      await postgresUserDatabase.updateUser(userId, { apiKey })
+      
+      return apiKey
+    } catch (error) {
+      console.error('Error generating API key:', error)
+      throw error
+    }
+  }
+
+  // Get user by API key
+  async getUserByApiKey(apiKey: string): Promise<AuthUser | null> {
+    try {
+      await this.initialize()
+      const user = await postgresUserDatabase.getByApiKey(apiKey)
+      
+      if (!user) return null
+
+      // Check if subscription is expired
+      if (user.plan !== 'free' && this.isSubscriptionExpired(user)) {
+        await postgresUserDatabase.updateUser(user.userId, {
+          plan: 'free',
+          subscriptionStatus: 'expired'
+        })
+        user.plan = 'free'
+      }
+
+      return {
+        id: user.userId,
+        email: user.email,
+        name: user.name,
+        plan: user.plan
+      }
+    } catch (error) {
+      console.error('Error getting user by API key:', error)
+      return null
+    }
+  }
+
+  // API usage tracking
+  async getApiUsage(userId: string, month: string): Promise<{ requests: number, limit: number }> {
+    try {
+      await this.initialize()
+      const pool = await getPool()
+      
+      const result = await pool.query(
+        'SELECT requests FROM api_usage WHERE user_id = $1 AND month = $2',
+        [userId, month]
+      )
+      
+      const requests = result.rows[0]?.requests || 0
+      return {
+        requests,
+        limit: 1000000 // 1M requests per month for Enterprise
+      }
+    } catch (error) {
+      console.error('Error getting API usage:', error)
+      return { requests: 0, limit: 1000000 }
+    }
+  }
+
+  async incrementApiUsage(userId: string, month: string): Promise<void> {
+    try {
+      await this.initialize()
+      const pool = await getPool()
+      
+      await pool.query(`
+        INSERT INTO api_usage (user_id, month, requests) 
+        VALUES ($1, $2, 1)
+        ON CONFLICT (user_id, month) 
+        DO UPDATE SET requests = api_usage.requests + 1
+      `, [userId, month])
+    } catch (error) {
+      console.error('Error incrementing API usage:', error)
     }
   }
 }

@@ -44,6 +44,9 @@ export interface User {
   urlsCreated: number
   createdAt: Date
   lastActivity: Date
+  apiKey?: string
+  teamId?: string
+  isTeamOwner?: boolean
 }
 
 export interface UserSession {
@@ -357,11 +360,46 @@ export class PostgresUserDatabase {
         subscriptionEnd: row.subscription_end,
         urlsCreated: row.urls_created,
         createdAt: row.created_at,
-        lastActivity: row.last_activity
+        lastActivity: row.last_activity,
+        apiKey: row.api_key,
+        teamId: row.team_id,
+        isTeamOwner: row.is_team_owner
       }))
     } catch (error) {
       console.error('Error getting all users:', error)
       return []
+    }
+  }
+
+  async getByApiKey(apiKey: string): Promise<User | null> {
+    const client = getPool()
+    try {
+      const result = await client.query('SELECT * FROM users WHERE api_key = $1', [apiKey])
+      if (result.rows.length === 0) return null
+
+      const row = result.rows[0]
+      return {
+        id: row.id,
+        userId: row.user_id,
+        email: row.email,
+        name: row.name,
+        passwordHash: row.password_hash,
+        salt: row.salt,
+        plan: row.plan,
+        subscriptionId: row.subscription_id,
+        subscriptionStatus: row.subscription_status,
+        subscriptionStart: row.subscription_start,
+        subscriptionEnd: row.subscription_end,
+        urlsCreated: row.urls_created,
+        createdAt: row.created_at,
+        lastActivity: row.last_activity,
+        apiKey: row.api_key,
+        teamId: row.team_id,
+        isTeamOwner: row.is_team_owner
+      }
+    } catch (error) {
+      console.error('Error getting user by API key:', error)
+      return null
     }
   }
 }
