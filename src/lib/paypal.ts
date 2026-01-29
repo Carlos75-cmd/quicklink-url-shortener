@@ -1,5 +1,8 @@
 // PayPal configuration
-export const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || 'test'
+export const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || 'Aev84IB12Q1N3-92HfV-IgV9bVrlhRw3Nfp0Vf-S7x97l3JoO5tViXMHQThSUQGYSx3xbiyIwQSBtg0d'
+
+// Debug: Log the client ID to verify it's loaded
+console.log('PayPal Client ID:', PAYPAL_CLIENT_ID)
 
 export const PAYPAL_PLANS = {
   PRO: {

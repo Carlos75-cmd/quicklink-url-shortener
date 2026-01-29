@@ -130,29 +130,83 @@ export default function Home() {
           <div id="pricing" className="bg-white rounded-2xl shadow-xl p-8">
             <h2 className="text-3xl font-bold text-center mb-8">Simple Pricing</h2>
             <div className="grid md:grid-cols-3 gap-8">
-              <div className="text-center p-6 border rounded-lg">
+              
+              {/* Free Plan */}
+              <div className="text-center p-6 border rounded-lg hover:shadow-lg transition-shadow">
                 <h3 className="text-xl font-semibold mb-2">Free</h3>
-                <p className="text-3xl font-bold mb-4">$0<span className="text-sm text-gray-500">/month</span></p>
-                <ul className="text-left space-y-2 mb-6">
-                  <li>✓ 100 links/month</li>
-                  <li>✓ Basic analytics</li>
-                  <li>✓ Standard support</li>
+                <div className="mb-4">
+                  <span className="text-4xl font-bold text-gray-900">$0</span>
+                  <span className="text-gray-500">/month</span>
+                </div>
+                <div className="bg-gray-50 rounded-lg p-3 mb-6">
+                  <p className="text-sm text-gray-600">Perfect for trying out QuickLink</p>
+                </div>
+                <ul className="text-left space-y-3 mb-8">
+                  <li className="flex items-center">
+                    <span className="text-green-500 mr-2">✓</span>
+                    <span className="text-sm text-gray-800">100 links per month</span>
+                  </li>
+                  <li className="flex items-center">
+                    <span className="text-green-500 mr-2">✓</span>
+                    <span className="text-sm text-gray-800">Basic click analytics</span>
+                  </li>
+                  <li className="flex items-center">
+                    <span className="text-green-500 mr-2">✓</span>
+                    <span className="text-sm text-gray-800">Standard support</span>
+                  </li>
+                  <li className="flex items-center">
+                    <span className="text-red-400 mr-2">✗</span>
+                    <span className="text-gray-400 text-sm">Custom domains</span>
+                  </li>
+                  <li className="flex items-center">
+                    <span className="text-red-400 mr-2">✗</span>
+                    <span className="text-gray-400 text-sm">Advanced analytics</span>
+                  </li>
                 </ul>
-                <button className="w-full py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-                  Get Started
+                <button className="w-full py-3 px-6 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium">
+                  Get Started Free
                 </button>
+                <p className="text-xs text-gray-500 mt-2">No credit card required</p>
               </div>
-              <div className="text-center p-6 border-2 border-blue-600 rounded-lg relative">
-                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white px-4 py-1 rounded-full text-sm">
-                  Popular
+
+              {/* Pro Plan */}
+              <div className="text-center p-6 border-2 border-blue-600 rounded-lg relative hover:shadow-xl transition-shadow bg-white">
+                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white px-4 py-1 rounded-full text-sm font-medium">
+                  Most Popular - Save $48/year
                 </div>
                 <h3 className="text-xl font-semibold mb-2">Pro</h3>
-                <p className="text-3xl font-bold mb-4">$9<span className="text-sm text-gray-500">/month</span></p>
-                <ul className="text-left space-y-2 mb-6">
-                  <li>✓ Unlimited links</li>
-                  <li>✓ Advanced analytics</li>
-                  <li>✓ Custom domains</li>
-                  <li>✓ Priority support</li>
+                <div className="mb-4">
+                  <span className="text-4xl font-bold text-blue-600">$9</span>
+                  <span className="text-gray-500">/month</span>
+                </div>
+                <div className="bg-blue-100 rounded-lg p-3 mb-6">
+                  <p className="text-sm text-blue-800 font-medium">🚀 Everything you need to grow your business</p>
+                </div>
+                <ul className="text-left space-y-3 mb-8">
+                  <li className="flex items-center">
+                    <span className="text-green-500 mr-2">✓</span>
+                    <span className="text-sm text-gray-800"><strong>Unlimited</strong> short links</span>
+                  </li>
+                  <li className="flex items-center">
+                    <span className="text-green-500 mr-2">✓</span>
+                    <span className="text-sm text-gray-800"><strong>Advanced analytics</strong> (geo, devices, referrers)</span>
+                  </li>
+                  <li className="flex items-center">
+                    <span className="text-green-500 mr-2">✓</span>
+                    <span className="text-sm text-gray-800"><strong>Custom domains</strong> (yoursite.com/abc)</span>
+                  </li>
+                  <li className="flex items-center">
+                    <span className="text-green-500 mr-2">✓</span>
+                    <span className="text-sm text-gray-800"><strong>Link passwords</strong> & expiration</span>
+                  </li>
+                  <li className="flex items-center">
+                    <span className="text-green-500 mr-2">✓</span>
+                    <span className="text-sm text-gray-800"><strong>Priority support</strong> (24h response)</span>
+                  </li>
+                  <li className="flex items-center">
+                    <span className="text-green-500 mr-2">✓</span>
+                    <span className="text-sm text-gray-800"><strong>QR codes</strong> for all links</span>
+                  </li>
                 </ul>
                 <div className="w-full">
                   <PayPalButton 
@@ -160,15 +214,44 @@ export default function Home() {
                     planName="Pro Plan"
                   />
                 </div>
+                <p className="text-xs text-blue-600 mt-2 font-medium">💰 ROI: Typically pays for itself in saved time</p>
               </div>
-              <div className="text-center p-6 border rounded-lg">
+
+              {/* Enterprise Plan */}
+              <div className="text-center p-6 border rounded-lg hover:shadow-lg transition-shadow">
                 <h3 className="text-xl font-semibold mb-2">Enterprise</h3>
-                <p className="text-3xl font-bold mb-4">$49<span className="text-sm text-gray-500">/month</span></p>
-                <ul className="text-left space-y-2 mb-6">
-                  <li>✓ Everything in Pro</li>
-                  <li>✓ Team management</li>
-                  <li>✓ API access</li>
-                  <li>✓ White-label solution</li>
+                <div className="mb-4">
+                  <span className="text-4xl font-bold text-gray-900">$49</span>
+                  <span className="text-gray-500">/month</span>
+                </div>
+                <div className="bg-purple-50 rounded-lg p-3 mb-6">
+                  <p className="text-sm text-purple-800 font-medium">🏢 Built for teams and agencies</p>
+                </div>
+                <ul className="text-left space-y-3 mb-8">
+                  <li className="flex items-center">
+                    <span className="text-green-500 mr-2">✓</span>
+                    <span className="text-sm text-gray-800"><strong>Everything in Pro</strong></span>
+                  </li>
+                  <li className="flex items-center">
+                    <span className="text-green-500 mr-2">✓</span>
+                    <span className="text-sm text-gray-800"><strong>Team management</strong> (up to 10 users)</span>
+                  </li>
+                  <li className="flex items-center">
+                    <span className="text-green-500 mr-2">✓</span>
+                    <span className="text-sm text-gray-800"><strong>Full API access</strong> (1M requests/month)</span>
+                  </li>
+                  <li className="flex items-center">
+                    <span className="text-green-500 mr-2">✓</span>
+                    <span className="text-sm text-gray-800"><strong>White-label</strong> (remove QuickLink branding)</span>
+                  </li>
+                  <li className="flex items-center">
+                    <span className="text-green-500 mr-2">✓</span>
+                    <span className="text-sm text-gray-800"><strong>24/7 phone support</strong> + dedicated manager</span>
+                  </li>
+                  <li className="flex items-center">
+                    <span className="text-green-500 mr-2">✓</span>
+                    <span className="text-sm text-gray-800"><strong>Advanced integrations</strong> (Zapier, Slack)</span>
+                  </li>
                 </ul>
                 <div className="w-full">
                   <PayPalButton 
@@ -176,6 +259,41 @@ export default function Home() {
                     planName="Enterprise Plan"
                   />
                 </div>
+                <p className="text-xs text-purple-600 mt-2 font-medium">📞 Need more? Custom plans available</p>
+              </div>
+            </div>
+
+            {/* Value Proposition */}
+            <div className="mt-12 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-8">
+              <div className="text-center mb-8">
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">Why Choose QuickLink?</h3>
+                <div className="grid md:grid-cols-3 gap-6">
+                  <div className="text-center">
+                    <div className="text-3xl mb-2">⚡</div>
+                    <h4 className="font-semibold mb-2">Lightning Fast</h4>
+                    <p className="text-sm text-gray-600">Global CDN ensures your links redirect in &lt;50ms worldwide</p>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-3xl mb-2">📊</div>
+                    <h4 className="font-semibold mb-2">Powerful Analytics</h4>
+                    <p className="text-sm text-gray-600">Track clicks, locations, devices, and optimize your campaigns</p>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-3xl mb-2">🔒</div>
+                    <h4 className="font-semibold mb-2">Enterprise Security</h4>
+                    <p className="text-sm text-gray-600">99.9% uptime, SSL encryption, and GDPR compliant</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Trust Indicators */}
+            <div className="mt-8 text-center">
+              <p className="text-gray-600 mb-4">Trusted by thousands of businesses worldwide</p>
+              <div className="flex justify-center items-center space-x-8 text-gray-400">
+                <span className="text-sm">🔒 Secure payments via PayPal</span>
+                <span className="text-sm">💳 Cancel anytime</span>
+                <span className="text-sm">📊 30-day money back guarantee</span>
               </div>
             </div>
           </div>
