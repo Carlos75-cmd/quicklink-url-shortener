@@ -55,6 +55,21 @@ export default function Home() {
     setShowUpgrade(false)
     
     try {
+      // Auto-fix URL if missing protocol
+      let processedUrl = url.trim()
+      if (!processedUrl.startsWith('http://') && !processedUrl.startsWith('https://')) {
+        processedUrl = 'https://' + processedUrl
+      }
+
+      // Validate URL format
+      try {
+        new URL(processedUrl)
+      } catch {
+        setError('Please enter a valid URL (e.g., example.com or https://example.com)')
+        setIsLoading(false)
+        return
+      }
+
       const headers: any = { 'Content-Type': 'application/json' }
       
       // Incluir sessionId si el usuario está logueado
@@ -66,12 +81,16 @@ export default function Home() {
       const response = await fetch('/api/shorten', {
         method: 'POST',
         headers,
-        body: JSON.stringify({ url })
+        body: JSON.stringify({ url: processedUrl })
       })
       
       const data = await response.json()
       
       if (response.ok) {
+        // Check if shortened URL is actually shorter
+        if (data.shortUrl.length >= processedUrl.length) {
+          setError(`Note: Your URL is already short (${processedUrl.length} chars). Shortened version is ${data.shortUrl.length} chars.`)
+        }
         setShortUrl(data.shortUrl)
         setUserStats(data.userStats)
       } else {
@@ -235,10 +254,10 @@ export default function Home() {
           <div className="max-w-2xl mx-auto mb-12">
             <form onSubmit={handleShorten} className="flex flex-col sm:flex-row gap-4">
               <input
-                type="url"
+                type="text"
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
-                placeholder="Enter your long URL here..."
+                placeholder="Enter your URL (e.g., example.com or https://example.com)"
                 className="flex-1 px-6 py-4 text-lg text-gray-900 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-500"
                 required
               />
@@ -465,18 +484,18 @@ export default function Home() {
                 <div className="grid md:grid-cols-3 gap-6">
                   <div className="text-center">
                     <div className="text-3xl mb-2">⚡</div>
-                    <h4 className="font-semibold mb-2">Lightning Fast</h4>
-                    <p className="text-sm text-gray-600">Global CDN ensures your links redirect in &lt;50ms worldwide</p>
+                    <h4 className="font-semibold text-gray-900 mb-2">Lightning Fast</h4>
+                    <p className="text-sm text-gray-700">Global CDN ensures your links redirect in &lt;50ms worldwide</p>
                   </div>
                   <div className="text-center">
                     <div className="text-3xl mb-2">📊</div>
-                    <h4 className="font-semibold mb-2">Powerful Analytics</h4>
-                    <p className="text-sm text-gray-600">Track clicks, locations, devices, and optimize your campaigns</p>
+                    <h4 className="font-semibold text-gray-900 mb-2">Powerful Analytics</h4>
+                    <p className="text-sm text-gray-700">Track clicks, locations, devices, and optimize your campaigns</p>
                   </div>
                   <div className="text-center">
                     <div className="text-3xl mb-2">🔒</div>
-                    <h4 className="font-semibold mb-2">Enterprise Security</h4>
-                    <p className="text-sm text-gray-600">99.9% uptime, SSL encryption, and GDPR compliant</p>
+                    <h4 className="font-semibold text-gray-900 mb-2">Enterprise Security</h4>
+                    <p className="text-sm text-gray-700">99.9% uptime, SSL encryption, and GDPR compliant</p>
                   </div>
                 </div>
               </div>
