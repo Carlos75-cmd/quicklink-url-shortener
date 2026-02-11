@@ -325,18 +325,18 @@ export default function Home() {
           <div id="features" className="grid md:grid-cols-3 gap-8 mb-16">
             <div className="text-center p-6">
               <BarChart3 className="h-12 w-12 text-blue-600 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold mb-2">Advanced Analytics</h3>
-              <p className="text-gray-600">Track clicks, locations, devices, and referrers with detailed insights.</p>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">Advanced Analytics</h3>
+              <p className="text-gray-700">Track clicks, locations, devices, and referrers with detailed insights.</p>
             </div>
             <div className="text-center p-6">
               <Shield className="h-12 w-12 text-blue-600 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold mb-2">Secure & Reliable</h3>
-              <p className="text-gray-600">Enterprise-grade security with 99.9% uptime guarantee.</p>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">Secure & Reliable</h3>
+              <p className="text-gray-700">Enterprise-grade security with 99.9% uptime guarantee.</p>
             </div>
             <div className="text-center p-6">
               <Zap className="h-12 w-12 text-blue-600 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold mb-2">Lightning Fast</h3>
-              <p className="text-gray-600">Global CDN ensures your links redirect instantly worldwide.</p>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">Lightning Fast</h3>
+              <p className="text-gray-700">Global CDN ensures your links redirect instantly worldwide.</p>
             </div>
           </div>
 
