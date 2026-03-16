@@ -122,6 +122,45 @@ export default function Home() {
   return (
     <PayPalProvider>
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+
+      {/* Structured Data for Google */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebApplication",
+            "name": "QuickLink",
+            "description": "Free URL shortener with advanced analytics. Shorten long URLs, track clicks, and analyze traffic.",
+            "url": "https://quicklink-url-shortener.vercel.app",
+            "applicationCategory": "UtilitiesApplication",
+            "operatingSystem": "Web",
+            "offers": [
+              {
+                "@type": "Offer",
+                "name": "Free Plan",
+                "price": "0",
+                "priceCurrency": "USD",
+                "description": "5 URLs per day, basic analytics"
+              },
+              {
+                "@type": "Offer",
+                "name": "Pro Plan",
+                "price": "9",
+                "priceCurrency": "USD",
+                "description": "Unlimited URLs, advanced analytics, custom domains"
+              },
+              {
+                "@type": "Offer",
+                "name": "Enterprise Plan",
+                "price": "49",
+                "priceCurrency": "USD",
+                "description": "Everything in Pro plus API access and white-label"
+              }
+            ]
+          })
+        }}
+      />
       {/* Header */}
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
